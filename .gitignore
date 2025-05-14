@@ -1,0 +1,23 @@
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Virtual environment
+venv/
+env/
+
+# IDE settings
+.idea/
+
+# Build artifacts
+build/
+dist/
+*.spec
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Executable or icon files
+*.exe
+*.ico
