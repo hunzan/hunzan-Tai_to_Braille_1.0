@@ -52,10 +52,10 @@ TaiBraille/
 ├── DoulosSIL-Regular.ttf # 點字顯示字型
 ├── taivi.ico # 執行檔圖示
 └── braille_data/ # 點字對應表資料夾
-├── consonants.json
-├── vowels_all.json
-├── rushio_syllables.json
-└── nasal_table.json
+            ├── consonants.json
+            ├── vowels_all.json
+            ├── rushio_syllables.json
+            └── nasal_table.json
 
 
 ---
@@ -66,9 +66,8 @@ TaiBraille/
 2. 安裝所需套件（如 `wxPython`、`tkinter`、`pyinstaller`）
 3. 執行：
 
-```bash
 python app_Tk.py
-# 或
+
 python app_wx.py
 
 pyinstaller --onefile --noconsole --icon=taivi.ico app_wx.py
