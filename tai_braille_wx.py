@@ -1,6 +1,21 @@
-import json
+import sys
 import os
+import json
 import wx
+import wx.richtext as rt
+
+def resource_path(relative_path):
+    """取得資源檔的絕對路徑，兼容 PyInstaller 打包後的環境"""
+    try:
+        base_path = sys._MEIPASS  # PyInstaller 打包時臨時資料夾
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
+# 下面就用 resource_path 取得字型、json 檔的路徑
+font_path = resource_path("DoulosSIL-Regular.ttf")
+json_path = resource_path(os.path.join("braille_data", "consonants.json"))
 
 # 資料夾與檔案路徑
 DATA_DIR = os.path.join(os.path.dirname(__file__), 'braille_data')
@@ -124,80 +139,99 @@ def tl_to_braille(text):
 class BrailleApp(wx.Frame):
     def __init__(self):
         super().__init__(None, title="台羅拼音轉台語點字", size=wx.Size(700, 600))
-
         panel = wx.Panel(self)
-        panel.SetBackgroundColour(wx.Colour("#FFFFE0"))  # ✅ 淺黃色背景
+
+        # 字型路徑（跟 .py 同層）
+        font_path = os.path.join(os.path.dirname(__file__), "DoulosSIL-Regular.ttf")
+
+        # 嘗試載入自帶字型
+        try:
+            wx.Font.AddPrivateFont(font_path)
+            self.font_name = "Doulos SIL"
+        except:
+            self.font_name = "Cambria Math"  # 備用字型（大部分系統都有）
+
+        # 預設字體大小
+        self.text_font_size = 26
+
+        # 建立字型物件
+        self.text_font = wx.Font(self.text_font_size, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, faceName=self.font_name)
+        self.label_font = wx.Font(16, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
+
+        panel.SetBackgroundColour(wx.Colour("#FFFFE0"))  # 淺黃色背景
 
         vbox = wx.BoxSizer(wx.VERTICAL)
 
-        # 🔹 字體大小範圍（初始值）
-        self.text_font_size = 26  # 初始值
-        self.label_font = wx.Font(16, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
-        self.text_font = wx.Font(self.text_font_size, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, faceName="Cambria Math")
-
-        # 🔹 標籤
-        input_label = wx.StaticText(panel, label="請輸入台羅拼音（不要加連字符）")
+        # 標籤：輸入
+        input_label = wx.StaticText(panel, label="請輸入台羅拼音（有無連字符「-」均可）")
         input_label.SetFont(self.label_font)
         vbox.Add(input_label, flag=wx.LEFT | wx.TOP, border=10)
 
-        # 🔹 輸入框
-        self.input_text = wx.TextCtrl(panel, style=wx.TE_MULTILINE | wx.TE_RICH2, size=wx.Size(650, 150))
+        # 輸入框
+        self.input_text = rt.RichTextCtrl(panel, style=wx.TE_MULTILINE, size=wx.Size(650, 150))
         self.input_text.SetFont(self.text_font)
         vbox.Add(self.input_text, proportion=1, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
 
-        # 🔹 輸出框
+        # 標籤：輸出
         output_label = wx.StaticText(panel, label="對應的台語點字")
         output_label.SetFont(self.label_font)
         vbox.Add(output_label, flag=wx.LEFT | wx.TOP, border=10)
 
+        # 輸出框
         self.output_text = wx.TextCtrl(panel, style=wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_RICH2, size=wx.Size(650, 150))
         self.output_text.SetFont(self.text_font)
         vbox.Add(self.output_text, proportion=1, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
 
-        # 🔹 滑桿：使用者可調整字體大小
+        # 滑桿：字體大小調整
         slider_label = wx.StaticText(panel, label="字體大小調整")
-        vbox.Add(slider_label, flag=wx.LEFT | wx.TOP, border=10)
+        vbox.Add(slider_label, flag=wx.LEFT | wx.TOP, border=12)
 
-        self.slider = wx.Slider(panel, value=self.text_font_size, minValue=14, maxValue=40, style=wx.SL_HORIZONTAL)
+        self.slider = wx.Slider(panel, value=self.text_font_size, minValue=20, maxValue=66, style=wx.SL_HORIZONTAL)
         self.slider.Bind(wx.EVT_SLIDER, self.on_font_change)
         vbox.Add(self.slider, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
 
-        # 🔹 按鈕區
+        # 按鈕區
         hbox = wx.BoxSizer(wx.HORIZONTAL)
 
-        # 🔹 轉換按鈕
+        # 按鈕：轉換
         convert_btn = wx.Button(panel, label="轉換", size=wx.Size(200, 50))
         convert_btn.SetFont(self.label_font)
-        convert_btn.SetBackgroundColour(wx.Colour("#FFD700"))  # 金黃色背景
-        convert_btn.SetForegroundColour(wx.Colour("#000000"))  # 黑色文字
-        convert_btn.SetWindowStyle(wx.BORDER_DOUBLE)  # 加粗框線
+        convert_btn.SetBackgroundColour(wx.Colour("#FFD700"))
+        convert_btn.SetForegroundColour(wx.Colour("#000000"))
+        convert_btn.SetWindowStyle(wx.BORDER_DOUBLE)
         convert_btn.Bind(wx.EVT_BUTTON, self.show_braille)
         hbox.Add(convert_btn, proportion=1, flag=wx.RIGHT, border=20)
 
-        # 🔹 清除按鈕
+        # 按鈕：清除
         clear_btn = wx.Button(panel, label="清除", size=wx.Size(200, 50))
         clear_btn.SetFont(self.label_font)
-        clear_btn.SetBackgroundColour(wx.Colour("#87CEEB"))  # 天藍色背景
-        clear_btn.SetForegroundColour(wx.Colour("#000000"))  # 黑色文字
-        clear_btn.SetWindowStyle(wx.BORDER_DOUBLE)  # 加粗框線
+        clear_btn.SetBackgroundColour(wx.Colour("#87CEEB"))
+        clear_btn.SetForegroundColour(wx.Colour("#000000"))
+        clear_btn.SetWindowStyle(wx.BORDER_DOUBLE)
         clear_btn.Bind(wx.EVT_BUTTON, self.clear_text)
         hbox.Add(clear_btn, proportion=1)
 
-        # ✅ **重置字體大小按鈕**
+        # 按鈕：重置字體大小
         reset_font_btn = wx.Button(panel, label="重置字體大小", size=wx.Size(200, 50))
         reset_font_btn.SetFont(self.label_font)
-        reset_font_btn.SetBackgroundColour(wx.Colour("#93FF93"))  # 淺綠色背景
-        reset_font_btn.SetForegroundColour(wx.Colour("#000000"))  # 黑色文字
+        reset_font_btn.SetBackgroundColour(wx.Colour("#93FF93"))
+        reset_font_btn.SetForegroundColour(wx.Colour("#000000"))
         reset_font_btn.SetWindowStyle(wx.BORDER_DOUBLE)
-        reset_font_btn.Bind(wx.EVT_BUTTON, self.on_font_reset)  # 🔹 綁定按鈕事件
+        reset_font_btn.Bind(wx.EVT_BUTTON, self.on_font_reset)
         hbox.Add(reset_font_btn, proportion=1, flag=wx.LEFT, border=20)
 
         vbox.Add(hbox, flag=wx.ALIGN_CENTER | wx.TOP | wx.BOTTOM, border=20)
         panel.SetSizer(vbox)
 
+        # **確保視窗顯示**
+        self.Show()
+        self.input_text.Refresh()
+        self.input_text.Update()
+
     def show_braille(self, event):
-        text = self.input_text.GetValue()
-        result = tl_to_braille(text)
+        original_text = self.input_text.GetValue()
+        clean_text = original_text.replace("-", "")
+        result = tl_to_braille(clean_text)
         wx.CallAfter(self.output_text.SetValue, result)
 
     def clear_text(self, event):
@@ -205,19 +239,17 @@ class BrailleApp(wx.Frame):
         self.output_text.Clear()
 
     def on_font_change(self, event):
-        """ 當滑桿移動時，改變輸入與輸出框的字體大小 """
         new_size = self.slider.GetValue()
-        self.text_font = wx.Font(new_size, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
+        self.text_font = wx.Font(new_size, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, faceName=self.font_name)
         self.input_text.SetFont(self.text_font)
         self.output_text.SetFont(self.text_font)
 
     def on_font_reset(self, event):
-        """ 按下按鈕時，重置字體大小到預設值 """
-        self.text_font_size = 26  # 回到原始字體大小
-        self.text_font = wx.Font(self.text_font_size, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD)
+        self.text_font_size = 26
+        self.text_font = wx.Font(self.text_font_size, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, faceName=self.font_name)
         self.input_text.SetFont(self.text_font)
         self.output_text.SetFont(self.text_font)
-        self.slider.SetValue(self.text_font_size)  # 同時更新滑桿數值
+        self.slider.SetValue(self.text_font_size)
 
 if __name__ == "__main__":
     app = wx.App()

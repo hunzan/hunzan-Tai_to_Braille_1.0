@@ -1,7 +1,21 @@
-import json
+import sys
 import os
+import json
 import tkinter as tk
 from tkinter.scrolledtext import ScrolledText
+
+def resource_path(relative_path):
+    """取得資源檔的絕對路徑，兼容 PyInstaller 打包後的環境"""
+    try:
+        base_path = sys._MEIPASS  # PyInstaller 打包時臨時資料夾
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
+# 下面就用 resource_path 取得字型、json 檔的路徑
+font_path = resource_path("DoulosSIL-Regular.ttf")
+json_path = resource_path(os.path.join("braille_data", "consonants.json"))
 
 # 資料夾與檔案路徑
 DATA_DIR = os.path.join(os.path.dirname(__file__), 'braille_data')
@@ -109,11 +123,14 @@ def tl_to_braille(text):
         result_words = []
 
         for word in words:
-            if word in nasal:
-                braille = "⠠" + nasal[word]["dots"]
+            # 將單詞中可能存在的連字符分開處理，但不加入點字
+            word_clean = word.replace("-", "")  # 移除連字符後處理
+
+            if word_clean in nasal:
+                braille = "⠠" + nasal[word_clean]["dots"]
                 result_words.append(braille)
             else:
-                syllables = split_syllables(word)
+                syllables = split_syllables(word_clean)
                 braille = ''.join(convert_syllable(s) for s in syllables)
                 result_words.append(braille)
 
@@ -124,9 +141,8 @@ def tl_to_braille(text):
 # GUI 設計
 def create_gui():
     window = tk.Tk()
-    # ✅ 使用完整路徑載入圖示
     icon_path = os.path.join(os.path.dirname(__file__), "taivi.ico")
-    if os.path.exists(icon_path):  # 確保檔案存在
+    if os.path.exists(icon_path):
         window.title("台羅拼音轉台語點字")
         window.geometry("700x600")
         window.iconbitmap(icon_path)
@@ -136,33 +152,40 @@ def create_gui():
 
     font = ("Arial", 20)
 
-    # 說明標籤
-    input_label = tk.Label(window, text="請輸入台羅拼音（不加連字符）", font=("Arial", 16), bg="#FFFFE0", anchor="w")
-    input_label.pack(padx=10, pady=(10, 0), fill="x")
+    # 設定 grid 結構
+    window.grid_rowconfigure(1, weight=1)  # 輸入欄位
+    window.grid_rowconfigure(3, weight=1)  # 輸出欄位
+    window.grid_columnconfigure(0, weight=1)
 
-    input_text = ScrolledText(window, height=5, font=font, bg="white", bd=3, relief="solid",
+    # 說明標籤
+    input_label = tk.Label(window, text="請輸入台羅拼音（系統會自動忽略連字符「-」）", font=("Arial", 16), bg="#FFFFE0", anchor="w")
+    input_label.grid(row=0, column=0, sticky="we", padx=10, pady=(10, 0))
+
+    input_text = ScrolledText(window, font=font, bg="white", bd=3, relief="solid",
                                highlightbackground="blue", highlightcolor="blue", highlightthickness=2)
-    input_text.pack(padx=10, pady=5, fill="x")
+    input_text.grid(row=1, column=0, sticky="nsew", padx=10, pady=5)
 
     output_label = tk.Label(window, text="對應的台語點字", font=("Arial", 16), bg="#FFFFE0", anchor="w")
-    output_label.pack(padx=10, pady=(15, 0), fill="x")
+    output_label.grid(row=2, column=0, sticky="we", padx=10, pady=(15, 0))
 
-    output_text = ScrolledText(window, height=5, font=font, bg="white", bd=3, relief="solid",
+    output_text = ScrolledText(window, font=font, bg="white", bd=3, relief="solid",
                                 highlightbackground="red", highlightcolor="red", highlightthickness=2)
-    output_text.pack(padx=10, pady=5, fill="x")
+    output_text.grid(row=3, column=0, sticky="nsew", padx=10, pady=5)
+
+    # 功能按鈕區
+    bottom_frame = tk.Frame(window, bg="#FFFFE0")
+    bottom_frame.grid(row=4, column=0, pady=20)
 
     def show_braille():
-        text = input_text.get("1.0", tk.END)
-        result = tl_to_braille(text)
+        text = input_text.get("1.0", tk.END).strip()
+        clean_text = text.replace("-", "")
+        result = tl_to_braille(clean_text)
         output_text.delete("1.0", tk.END)
         output_text.insert(tk.END, result)
 
     def clear_text():
         input_text.delete("1.0", tk.END)
         output_text.delete("1.0", tk.END)
-
-    bottom_frame = tk.Frame(window, bg="#FFFFE0")
-    bottom_frame.pack(pady=20)
 
     convert_btn = tk.Button(bottom_frame, text="轉換", font=font, command=show_braille, bg="#FFDEAD")
     convert_btn.pack(side="left", padx=40)
