@@ -184,5 +184,17 @@
   "ǹg": { "dots": "⠬⠄" },
   "n̂g": { "dots": "⠬⠆" },
   "n̄g": { "dots": "⠬⠒" },
-  "n̋g": { "dots": "⠬⠃" }
+  "n̋g": { "dots": "⠬⠃" },
+  "om": { "dots": "om⠤" },
+  "óm": { "dots": "om⠂" },
+  "òm": { "dots": "om⠄" },
+  "ôm": { "dots": "om⠆" },
+  "ōm": { "dots": "om⠒" },
+  "őm": { "dots": "om⠃" },
+  "uang": { "dots": "uang⠤" },
+  "uáng": { "dots": "uang⠂" },
+  "uàng": { "dots": "uang⠄" },
+  "uâng": { "dots": "uang⠆" },
+  "uāng": { "dots": "uang⠒" },
+  "ua̋ng": { "dots": "uang⠃" }
 }

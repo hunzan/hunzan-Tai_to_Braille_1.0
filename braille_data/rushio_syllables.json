@@ -52,5 +52,9 @@
   "o̍k": {"dots": "⠯⠔"},
   "ia̍p": {"dots": "⠿⠔"},
   "i̍p": {"dots": "⠣⠔"},
-  "a̍p": {"dots": "⠩⠔"}
+  "a̍p": {"dots": "⠩⠔"},
+  "op": {"dots": "om⠢"},
+  "o̍p": {"dots": "om⠔"},
+  "uak": {"dots": "uang⠢"},
+  "ua̍k": {"dots": "uang⠔"}
 }
