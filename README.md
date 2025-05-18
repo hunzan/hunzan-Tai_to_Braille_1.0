@@ -21,7 +21,8 @@ TaiLo Braille Converter
 
 📥 如何安裝與使用？
 
-到 GitHub 網頁下載 zip 檔 → 👉 點這裡下載
+下載 Windows 免安裝版本：[前往 Release 頁面](https://github.com/hunzan/hunzan-Tai_to_Braille/releases)
+
 
 解壓縮 zip 檔
 
