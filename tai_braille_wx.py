@@ -6,13 +6,10 @@ import wx.adv
 import wx.richtext as rt
 
 def resource_path(relative_path):
-    """取得資源檔的絕對路徑，兼容 PyInstaller 打包後的環境"""
-    try:
-        base_path = sys._MEIPASS  # PyInstaller 打包時臨時資料夾
-    except Exception:
-        base_path = os.path.abspath(".")
-
-    return os.path.join(base_path, relative_path)
+    # 專為 PyInstaller 打包後取得資源路徑
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, relative_path)
+    return os.path.join(os.path.abspath("."), relative_path)
 
 # 下面就用 resource_path 取得字型、json 檔的路徑
 font_path = resource_path("DoulosSIL-Regular.ttf")
@@ -142,8 +139,10 @@ class BrailleApp(wx.Frame):
         super().__init__(None, title="台羅拼音轉台語點字", size=wx.Size(700, 600))
         panel = wx.Panel(self)
 
-        import sys
-        import os
+        # 載入 .ico 檔
+        icon_path = resource_path("taivi.ico")
+        icon = wx.Icon(icon_path, wx.BITMAP_TYPE_ICO)
+        self.SetIcon(icon)
 
         if hasattr(sys, '_MEIPASS'):
             base_path = sys._MEIPASS
@@ -233,14 +232,20 @@ class BrailleApp(wx.Frame):
         hbox.Add(self.reset_font_btn, proportion=1, flag=wx.LEFT, border=20)
 
         vbox.Add(hbox, flag=wx.ALIGN_CENTER | wx.TOP | wx.BOTTOM, border=20)
+
+        # Footer
+        footer = wx.StaticText(panel, label="© 2025 開發者：Lîm A-kâu（林阿猴）& Kim Chio（金蕉），供免費教學及學習使用。")
+        footer_font = wx.Font(12, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_LIGHT)
+        footer.SetFont(footer_font)
+        footer.SetForegroundColour(wx.Colour("#444444"))
+        vbox.Add(footer, flag=wx.ALIGN_CENTER | wx.BOTTOM, border=10)
+
         panel.SetSizer(vbox)
 
         # **確保視窗顯示**
         self.Show()
         self.input_text.Refresh()
         self.input_text.Update()
-
-    import wx.adv  # 確保有這行
 
     def show_braille(self, event):
         original_text = self.input_text.GetValue()
@@ -288,7 +293,7 @@ class BrailleApp(wx.Frame):
         self.slider.SetValue(self.text_font_size)
 
 if __name__ == "__main__":
-    app = wx.App()
+    app = wx.App(False)
     frame = BrailleApp()
     frame.Show()
     app.MainLoop()

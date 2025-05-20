@@ -141,6 +141,8 @@ def tl_to_braille(text):
 # GUI 設計
 def create_gui():
     window = tk.Tk()
+    window.title("TaiBraille")
+
     icon_path = os.path.join(os.path.dirname(__file__), "taivi.ico")
     if os.path.exists(icon_path):
         window.title("台羅拼音轉台語點字")
@@ -153,8 +155,9 @@ def create_gui():
     font = ("Arial", 20)
 
     # 設定 grid 結構
-    window.grid_rowconfigure(1, weight=1)  # 輸入欄位
-    window.grid_rowconfigure(3, weight=1)  # 輸出欄位
+    window.grid_rowconfigure(1, weight=1)  # 輸入欄位可以拉伸
+    window.grid_rowconfigure(3, weight=1)  # 輸出欄位可以拉伸
+    # 不給其他列 weight，避免拉出空白區域
     window.grid_columnconfigure(0, weight=1)
 
     # 說明標籤
@@ -192,6 +195,15 @@ def create_gui():
 
     clear_btn = tk.Button(bottom_frame, text="清除", font=font, command=clear_text, bg="#FFDAB9")
     clear_btn.pack(side="right", padx=40)
+
+    # 版權說明放 footer
+    footer = tk.Label(window, text="© 2025 開發者：Lîm A-kâu（林阿猴）& Kim Chio（金蕉），供免費教學及學習使用。",
+                      font=("Arial", 12))
+    footer.grid(row=5, column=0, sticky="we", pady=10)
+
+    # 加這段，避免主視窗因為 footer 或按鈕列被拉長出現空白
+    window.grid_rowconfigure(4, weight=0)
+    window.grid_rowconfigure(5, weight=0)
 
     window.mainloop()
 
