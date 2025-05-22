@@ -1,81 +1,46 @@
-台羅轉台語點字工具
-TaiLo Braille Converter
+# TaiLo Braille Converter - 台羅拼音轉台語點字工具【蕉點1號】
 
-🧑‍🎓 這是一款可以將「台羅拼音」轉成「台語六點點字」的工具，幫助視障朋友學習台語台羅拼音與台語點字對照，能夠學習「台語點字基本拼音規則和聲調標示法」。
+🧑‍🏫 A lightweight tool that converts **Taiwanese Romanization (Tâi-lô)** into **6-dot Taiwanese Braille**.  
+Designed especially for visually impaired users, this app helps learners compare Romanization with Braille spelling and tone marks.
 
-🖥️ 共有 2 個版本：
+🔵 **Executable**: `tai_braille_wx.exe`
 
-🔵 tai_braille_Tk.exe
+- Suitable for NVDA users and general learners
+- Font size adjustable
+- Screen reader friendly
 
-適合：一般使用者、電腦具備放大輔助功能的低視力使用者
+📥 **How to Install and Use**
 
-特點：畫面單純、操作簡單
+1. Download the Windows standalone zip from the [Releases page](https://github.com/hunzan/hunzan-Tai_to_Braille/releases)
+2. Unzip the file
+3. Double-click to launch `tai_braille_wx.exe`
 
-不支援螢幕報讀器
+✍️ **Input Methods**
 
-⚫ tai_braille_wx.exe
+- Type directly into the input field  
+  (Best used with the [FaithHopeLove Taiwanese/Kejia IME](https://taigi.fhl.net/TaigiIME/) for Romanized input)
 
-適合：NVDA 使用者、需要放大字體的朋友、一般使用者
+- Or paste Taiwanese Romanization text (with natural tone marks)
 
-特點：介面可朗讀、字體大小可調整
+🔡 **Conversion Example**
 
-📥 如何安裝與使用？
+Input: `guá sī tâiuânlâng` or `guá sī tâi-uân-lâng`  
+Output (Braille): `⠛⠺⠂ ⠎⠊⠒ ⠙⠜⠆⠻⠆⠇⠭⠆`  
+(Note: The system ignores hyphens automatically)
 
-下載 Windows 免安裝版本：[前往 Release 頁面](https://github.com/hunzan/hunzan-Tai_to_Braille/releases)
+🙋 **Want to connect or contribute?**
 
+- **Lîm Akâu** – Orientation and mobility instructor, Taiwanese language advocate  
+- **KimTsio** – Language tech collaborator
 
-解壓縮 zip 檔
+📜 **License**
 
-點兩下打開你要用的 .exe 檔
-（建議視障朋友用 tai_braille_wx.exe）
-
-✍️ 如何輸入？
-
-建議搭配電腦台語輸入法「信望愛台／客語輸入法」，直接輸入台羅拼音，更好用！
-👉 下載「信望愛台／客語輸入法」：https://taigi.fhl.net/TaigiIME/
-
-🔡 轉換範例：
-
-🔵 tai_braille_Tk.exe
-
-輸入：guá sī tâiuânlâng 或 guá sī tâi-uân-lâng
-
-明眼字台羅欄位顯示：guá sī tâiuânlâng（無論輸入時有沒有連字符，系統會直接幫你去除）
-
-輸出：⠛⠺⠂ ⠎⠊⠒ ⠙⠜⠆⠻⠆⠇⠭⠆
-
-⚫ tai_braille_wx.exe
-
-輸入：guá sī tâiuânlâng 或 guá sī tâi-uân-lâng
-
-明眼字台羅欄位顯示：guá sī tâiuânlâng 或 guá sī tâi-uân-lâng
-
-輸出：⠛⠺⠂ ⠎⠊⠒ ⠙⠜⠆⠻⠆⠇⠭⠆（系統會自動忽略明眼字的連字符）
-
-🆘 小提醒
-
-tk 版 不支援 NVDA
-
-wx 版 可完整搭配 NVDA 使用
-
-🙋 有問題怎麼辦？
-歡迎聯絡我們！
-
-林阿猴（Lîm Akâu）：定向行動老師、台語文推廣者
-
-金蕉（KimTsio）：語言技術協作者
-
-📜 授權與使用
-✅ 教學、個人使用免費
-
-❌ 禁止商業用途（包含販售、上架、變相營利）
-
-✅ 歡迎非營利推廣、引用，但請註明作者
-
-我們希望這個工具幫助真正有需要的人，謝謝你的支持！
+- ✅ Free for teaching and personal use
+- ❌ Commercial use prohibited (no selling, reselling, or profit-based distribution)
+- ✅ Non-commercial sharing encouraged with proper credit
 
 ---
 
-## 📂 開發者文件
+📘 **[使用者中文版說明 / Full README in Traditional Chinese](README_zh.md)**
 
-本專案詳細開發說明請參閱 [README_for_developers.md](README_for_developers.md)
+📂 For technical details and data structure, see [README_for_developers.md](README_for_developers.md)
